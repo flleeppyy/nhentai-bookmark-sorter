@@ -3,7 +3,7 @@ const readline = require('readline');
 const request = require('request');
 const requestp = require('request-promise');
 const rl = readline.createInterface({
-  input: fs.createReadStream('test.txt', 'latin1'),
+  input: fs.createReadStream('nhentai_loli_bookmarks.html', 'latin1'),
   crlfDelay: Infinity
 });
 
@@ -83,6 +83,7 @@ function dwnldnh(gid, mediaid, pages, name){
                 )
                 x++;
             }
+
             Promise.all(promises).then(values => {
                 // run this if all requests where successful
                 console.error(values)
@@ -108,6 +109,7 @@ rl.on('line', (line) => {
     strippedid = url.split('/g/')[1].split('/')[0];
 
     request.get(url, (error, resp, body) => {
+        console.log(body)
         newbody = body.split('JSON.parse(')[1].split(');')[0];
         galleryjson = JSON.parse(JSON.parse(newbody));
         dwnldnh(strippedid, galleryjson['media_id'], galleryjson['num_pages'], title);
