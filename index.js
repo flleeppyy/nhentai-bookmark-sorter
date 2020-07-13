@@ -50,29 +50,47 @@ function dwnldnh(gid, mediaid, pages, name){
         statusthing(st, type)
     })
 
-    function fuckthis(type) {
+    async function fuckthis(type) {
         console.log(type)
          if (type == "png" || type == "jpg") {
             console.log("did type if")
             let string;
+            
+            //refactor to promise.all by gen
+            const promises = []
             let x = 1;
-            console.log(x)
-            while(pages > x) { // THIS DOES NOT WORK, IT DOWNLOADS THE FIRST PAGE AND THE LAST PAGE ONLY AND ITS FUCKING BULLSHTI 🖕🖕🖕🖕🖕🖕🖕🖕🖕🖕🖕🖕🖕🖕🖕🖕🖕🖕🖕🖕🖕🖕🖕🖕
-                console.log("making request")
-
-                requestp.get({url: `${iurl}/${mediaid}/${x}.${type}`, encoding: null}).then(function(res) {
-                    //console.log('content-type:', res.headers['content-type']);
-                    //console.log('content-length:', res.headers['content-length']);
-                    string = Boolean(name) ? `./doujins/${gid} - ${name}` : `./doujins/${gid}`;
-                    if (!fs.existsSync(string)){
-                        fs.mkdirSync(string);
-                    }
-                    const buffer = Buffer.from(res, 'utf8');
-                    fs.writeFileSync(`${string}/${x}.${type}`, buffer);
-                }).catch(err => {console.log(err)})
+            while(pages > x) {
+                promises.push( new Promise((resolve, reject) => {
+                    console.log("making request " + x)
+                    const num = x
+                    requestp.get({url: `${iurl}/${mediaid}/${x}.${type}`, encoding: null}).then(function(res) {
+                        //console.log('content-type:', res.headers['content-type']);
+                        //console.log('content-length:', res.headers['content-length']);
+                        string = Boolean(name) ? `./doujins/${gid} - ${name}` : `./doujins/${gid}`;
+                        if (!fs.existsSync('./doujins')){
+                            fs.mkdirSync('./doujins');
+                        }
+                        if (!fs.existsSync(string)){
+                            fs.mkdirSync(string);
+                        }
+                        const buffer = Buffer.from(res, 'utf8');
+                        fs.writeFileSync(`${string}/${num}.${type}`, buffer);
+                        resolve()
+                    }).catch(err => {
+                        console.log(err)
+                        reject(err)})
+                })
+                )
                 x++;
-                console.log(x)
             }
+            Promise.all(promises).then(values => {
+                // run this if all requests where successful
+                console.error(values)
+            })
+            .catch(err=>{
+                //run this if one or more requests failed
+                console.error(err)
+            })
         }
     }
 }
