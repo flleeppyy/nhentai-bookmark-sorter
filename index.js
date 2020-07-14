@@ -2,6 +2,8 @@ const fs = require('fs');
 const readline = require('readline');
 const request = require('request');
 const requestp = require('request-promise');
+const nhentai = require('nhentai-js')
+const { SSL_OP_EPHEMERAL_RSA } = require('constants');
 const rl = readline.createInterface({
   input: fs.createReadStream('nhentai_loli_bookmarks.html', 'latin1'),
   crlfDelay: Infinity
@@ -16,6 +18,7 @@ let strippedid;
 let newbody;
 let iurl;
 
+let proxyurl = "";
 /** 
  * gid: nhentai ID
  * 
@@ -50,7 +53,7 @@ function dwnldnh(gid, mediaid, pages, name){
         statusthing(st, type)
     })
 
-    async function fuckthis(type) {
+    setTimeout(async function fuckthis(type) {
         console.log(type)
          if (type == "png" || type == "jpg") {
             console.log("did type if")
@@ -93,7 +96,7 @@ function dwnldnh(gid, mediaid, pages, name){
                 console.error(err)
             })
         }
-    }
+    }, 1000)
 }
 
 
@@ -107,13 +110,15 @@ rl.on('line', (line) => {
     title = title.replace(' » nhentai: hentai doujinshi and manga', '')
     //console.log(`Title: ${title}\nURL: ${url}`);
     strippedid = url.split('/g/')[1].split('/')[0];
-
-    request.get(url, (error, resp, body) => {
-        console.log(body)
-        newbody = body.split('JSON.parse(')[1].split(');')[0];
-        galleryjson = JSON.parse(JSON.parse(newbody));
-        dwnldnh(strippedid, galleryjson['media_id'], galleryjson['num_pages'], title);
+    try {
+        nhentai.getDoujin(strippedid).then(data => {
+        console.log(data)
+        //dwnldnh(strippedid, galleryjson['media_id'], galleryjson['num_pages'], title)
     })
+    }catch(err) {
+        throw err;
+    }
+    
   }
 
 });

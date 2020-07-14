@@ -6,6 +6,8 @@
   "repository": "https://github.com/flleeppyy/nhentai-bookmark-sorter",
   "dependencies": {
     "cheerio": "^1.0.0-rc.3",
+    "nhentai-api-js": "^1.1.4",
+    "nhentai-js": "^4.0.0",
     "nodemon": "^2.0.4",
     "request": "^2.88.2",
     "request-promise": "^4.2.5",
